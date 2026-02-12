@@ -65,6 +65,29 @@ app.get('/admin', requireAuth, async (req, res) => {
     }
 });
 
+// Debug Route
+app.get('/debug', async (req, res) => {
+    const envVars = {
+        POSTGRES_URL: process.env.POSTGRES_URL ? 'Defined' : 'Undefined',
+        DATABASE_URL: process.env.DATABASE_URL ? 'Defined' : 'Undefined',
+        PORT: process.env.PORT
+    };
+    
+    let dbStatus = 'Unknown';
+    try {
+        await db.query('SELECT 1');
+        dbStatus = 'Connected';
+    } catch (e) {
+        dbStatus = 'Error: ' + e.message;
+    }
+
+    res.json({
+        env: envVars,
+        dbStatus: dbStatus,
+        memory: process.memoryUsage()
+    });
+});
+
 // Debug/Setup Route
 app.get('/setup', async (req, res) => {
     try {
@@ -138,29 +161,6 @@ app.get('/:alias', async (req, res) => {
 
 app.get('/', (req, res) => {
     res.redirect('/login');
-});
-
-// Debug Route
-app.get('/debug', async (req, res) => {
-    const envVars = {
-        POSTGRES_URL: process.env.POSTGRES_URL ? 'Defined' : 'Undefined',
-        DATABASE_URL: process.env.DATABASE_URL ? 'Defined' : 'Undefined',
-        PORT: process.env.PORT
-    };
-    
-    let dbStatus = 'Unknown';
-    try {
-        await db.query('SELECT 1');
-        dbStatus = 'Connected';
-    } catch (e) {
-        dbStatus = 'Error: ' + e.message;
-    }
-
-    res.json({
-        env: envVars,
-        dbStatus: dbStatus,
-        memory: process.memoryUsage()
-    });
 });
 
 app.listen(PORT, (err) => {
