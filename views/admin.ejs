@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Enlace copiado al portapapeles');
+            });
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center py-10">
+    
+    <div class="w-full max-w-2xl">
+        <!-- Create Section -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 class="text-xl font-semibold text-center mb-6 text-gray-800">Crear nueva redirección</h2>
+            
+            <form action="/admin/create" method="POST">
+                <div class="flex mb-4">
+                    <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">
+                        <%= host %>/
+                    </span>
+                    <input type="text" name="alias" class="rounded-none rounded-r-md bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5" placeholder="alias (opcional)">
+                </div>
+                
+                <div class="mb-4">
+                    <input type="url" name="url" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="https://destino.com" required>
+                </div>
+
+                <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Crear alias</button>
+            </form>
+        </div>
+
+        <!-- List Section -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold mb-4 text-gray-800">Tus enlaces</h2>
+            
+            <div class="space-y-4">
+                <% if (links.length === 0) { %>
+                    <p class="text-center text-gray-500">No hay enlaces creados aún.</p>
+                <% } %>
+
+                <% links.forEach(link => { %>
+                    <div class="flex items-center justify-between p-3 border border-blue-100 rounded-lg bg-blue-50/10 hover:bg-gray-50">
+                        <a href="/<%= link.alias %>" target="_blank" class="text-blue-600 hover:underline truncate mr-4 font-medium">
+                            <%= host %>/<%= link.alias %>
+                        </a>
+                        
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <span class="bg-gray-600 text-white text-xs font-medium px-2.5 py-1 rounded">
+                                <%= link.clicks %> clics
+                            </span>
+                            
+                            <button onclick="copyToClipboard('<%= host %>/<%= link.alias %>')" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded text-sm px-3 py-1.5">
+                                Copiar
+                            </button>
+                            
+                            <form action="/admin/delete/<%= link.id %>" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este enlace?');" class="inline">
+                                <button type="submit" class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded text-sm px-3 py-1.5">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        
+        <div class="text-center mt-8 text-gray-500 text-sm">
+            © 2026 — Panel protegido
+            <br>
+            <a href="/logout" class="text-blue-400 hover:underline">Cerrar sesión</a>
+        </div>
+    </div>
+
+</body>
+</html>
