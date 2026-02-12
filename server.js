@@ -17,6 +17,7 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -33,10 +34,15 @@ const requireAuth = (req, res, next) => {
 
 // Login Routes
 app.get('/login', (req, res) => {
-    if (req.cookies.auth === ADMIN_PASSWORD) {
-        return res.redirect('/admin');
+    try {
+        if (req.cookies.auth === ADMIN_PASSWORD) {
+            return res.redirect('/admin');
+        }
+        res.render('login', { error: null });
+    } catch (err) {
+        console.error("Login render error:", err);
+        res.status(500).send("Error al cargar login: " + err.message);
     }
-    res.render('login', { error: null });
 });
 
 app.post('/login', (req, res) => {
