@@ -17,6 +17,11 @@ if (process.env.POSTGRES_URL || process.env.DATABASE_URL) {
         }
     });
 
+    // Capturar errores del pool para evitar crash
+    db.on('error', (err, client) => {
+        console.error('Unexpected error on idle client', err);
+    });
+
     console.log('Connected to PostgreSQL database.');
     
     // Crear tabla en Postgres
