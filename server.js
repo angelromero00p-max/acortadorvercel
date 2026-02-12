@@ -61,7 +61,27 @@ app.get('/admin', requireAuth, async (req, res) => {
         res.render('admin', { links: result.rows, host: req.get('host') });
     } catch (err) {
         console.error(err);
-        res.status(500).send("Database error");
+        res.status(500).send("Error de base de datos: " + err.message);
+    }
+});
+
+// Debug/Setup Route
+app.get('/setup', async (req, res) => {
+    try {
+        if (db.query) {
+             await db.query(`CREATE TABLE IF NOT EXISTS links (
+                id SERIAL PRIMARY KEY,
+                alias TEXT UNIQUE,
+                url TEXT,
+                clicks INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`);
+            res.send("Tabla 'links' creada o verificada correctamente. <a href='/'>Volver al inicio</a>");
+        } else {
+            res.send("Base de datos no inicializada correctamente.");
+        }
+    } catch (err) {
+        res.status(500).send("Error al configurar DB: " + err.message);
     }
 });
 
@@ -112,7 +132,7 @@ app.get('/:alias', async (req, res) => {
         }
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error");
+        res.status(500).send("Error al redirigir: " + err.message);
     }
 });
 
